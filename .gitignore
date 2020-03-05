@@ -1,0 +1,6 @@
+*.xlsx
+*.bat
+__pycache__
+Sample
+venv
+.idea
