@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from itertools import filterfalse
+from typing import Dict, List
 from messages import commit_messages
 import os, re, traceback, random, json, subprocess, secrets, string
 
@@ -29,10 +30,10 @@ class FormatError(Exception):
     pass
 
 
-def generate_commit_dates(start_date:str, end_date:str, min_active_days_per_week:int, max_active_days_per_week:int, start_hour:int, end_hour:int, min_commit_per_day:int, max_commit_per_day:int) -> dict[str, list[str]]:
+def generate_commit_dates(start_date:str, end_date:str, min_active_days_per_week:int, max_active_days_per_week:int, start_hour:int, end_hour:int, min_commit_per_day:int, max_commit_per_day:int) -> Dict[str, List[str]]:
     """Generate a commit dates dictionary and pair each entry with a list commit hours."""
     
-    def _generate_active_dates(start_date:str, end_date:str, min_active_days_per_week:int, max_active_days_per_week:int) -> list[str]:
+    def _generate_active_dates(start_date:str, end_date:str, min_active_days_per_week:int, max_active_days_per_week:int) -> List[str]:
         """Generate a list of active dates"""
         DATE_REGEX_PATTERN = r'^(\d{4})-(\d{2})-(\d{2})$'
         if not bool(re.match(DATE_REGEX_PATTERN, start_date)) or not bool(re.match(DATE_REGEX_PATTERN, end_date)):
@@ -64,7 +65,7 @@ def generate_commit_dates(start_date:str, end_date:str, min_active_days_per_week
         active_dates = sorted(active_dates)
         return active_dates
 
-    def _generate_commit_hours(active_dates:list[datetime], start_hour:int, end_hour:int, min_commit_per_day:int, max_commit_per_day:int) -> dict[str,list[str]]:
+    def _generate_commit_hours(active_dates:List[datetime], start_hour:int, end_hour:int, min_commit_per_day:int, max_commit_per_day:int) -> Dict[str,List[str]]:
         """Generate commit hours per date"""
         commit_dates = {}
         for active_date in active_dates:
@@ -207,6 +208,10 @@ def make_commit_concurrency():
 
 
 def print_banner():
+    pass
+
+
+def user_input() -> Dict[str, str]:
     pass
 
 
