@@ -16,9 +16,9 @@ BASE_DIR = os.path.dirname(__file__)
 LOCAL_REPO = os.path.join(BASE_DIR, 'repo')
 if not os.path.isdir(LOCAL_REPO):
     os.mkdir(LOCAL_REPO, 777)
-
 ###
 
+TARGET_FILE = None
 DAYS_PER_WEEK = 7
 SEC_PER_HOUR = 3600
 TEST_REPO_URL = 'https://github.com/ttran-tech/git-contribot-test.git'
@@ -87,7 +87,7 @@ def generate_commit_dates(start_date:str, end_date:str, min_active_days_per_week
 
 def is_remote_repo_exist(repo_url:str) -> bool:
     """Check if remote repo exists"""
-    print(f" [+] Checking remote repository: {repo_url} ...", end="")
+    print(f" [+] Checking remote repository: {repo_url} ... ", end="")
     try:
         subprocess.run(['git', 'ls-remote', repo_url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True) # subprocess.DEVNUL same as 2>/dev/null
         print("ok")
@@ -104,7 +104,7 @@ def is_local_repo_exist(repo_name:str) -> bool:
 
 def extract_repo_name(repo_url:str) -> str:
     """Extract the repo name from repo URL"""
-    print(" [+] Extracting repository name ...", end="")
+    print(" [+] Extracting repository name ... ", end="")
     try:
         repo_name = re.search(r'/[\w-]+\.git$', repo_url).group(0)
         repo_name = repo_name.replace('/', '').split('.')[0]
@@ -112,13 +112,14 @@ def extract_repo_name(repo_url:str) -> str:
         print(f"   => Repository Name: {repo_name}")
         return repo_name
     except AttributeError:
+        print("failed")
         traceback.print_exc()
         return None
 
 
 def clone_repo(repo_url:str, repo_name:str) -> bool:
     """Clone a repo to from the remote repo"""
-    print(" [+] Cloning repository ...", end="")
+    print(" [+] Cloning repository ... ", end="")
     try:
         os.chdir(LOCAL_REPO) # change current working directory to "repo", the next line clones a remote repo in "repo" folder
         subprocess.run(['git', 'clone', repo_url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
@@ -126,32 +127,45 @@ def clone_repo(repo_url:str, repo_name:str) -> bool:
             print("ok")
             return True 
     except AttributeError:
+        print("failed")
         traceback.print_exc()
         return False
+
+
+def create_target_file(repo_name:str) -> bool:
+    """Create a target file inside the local repo"""
+    global TARGET_FILE
+    print(" [+] Creating target file ... ", end="")
+    TARGET_FILE = os.path.join(LOCAL_REPO, f"{repo_name}/target.txt")
+    with open(TARGET_FILE, 'w') as file:
+        file.close()
+
+    if not os.path.exists(TARGET_FILE):
+        print("failed")
+        raise FileNotFoundError
+    print("ok")
+    return True
 
 
 def print_banner():
     pass
 
 
-def debug_run():
+def main():
     if is_remote_repo_exist(TEST_REPO_URL):
         repo_name = extract_repo_name(TEST_REPO_URL)
-        clone_repo(TEST_REPO_URL, repo_name)
-
-
-
-def main():
-    extract_repo_name(TEST_REPO_URL)
+        if not is_local_repo_exist(repo_name):
+            clone_repo(TEST_REPO_URL, repo_name)
+        create_target_file(repo_name)
 
 
 
 
 if __name__ == '__main__':
+    main()
     # commit_dates = generate_commit_dates('2023-01-01', '2023-03-01', 2, 5, 8, 17, 1, 8)
     
     # if commit_dates:
     #     commit_dates_json = json.dumps(commit_dates, indent=2)
     #     print(commit_dates_json)
-    # main()
-    debug_run()
+    
