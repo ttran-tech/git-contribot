@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from itertools import filterfalse
 from messages import commit_messages
-import os, re, traceback, random, json, subprocess, shutil
+import os, re, traceback, random, json, subprocess, secrets, string
 
 # Brief:        This file contains the main source code for git-contribot project
 #
@@ -18,6 +18,7 @@ if not os.path.isdir(LOCAL_REPO):
     os.mkdir(LOCAL_REPO, 777)
 ###
 
+TARGET_REPO = None
 TARGET_FILE = None
 DAYS_PER_WEEK = 7
 SEC_PER_HOUR = 3600
@@ -38,6 +39,9 @@ def generate_commit_dates(start_date:str, end_date:str, min_active_days_per_week
         if not bool(re.match(DATE_REGEX_PATTERN, start_date)) or not bool(re.match(DATE_REGEX_PATTERN, end_date)):
             raise FormatError('Invalid date format. Date format must match "YYYY-MM-DD". Example: 2025-01-01')
         
+        if start_date == end_date:
+            raise FormatError('Invalid date range: The start date and end date cannot be the same')
+
         DATE_FORMAT = '%Y-%m-%d'
         start_date = datetime.strptime(f"{start_date}", DATE_FORMAT)
         end_date = datetime.strptime(f"{end_date}", DATE_FORMAT)
@@ -69,8 +73,8 @@ def generate_commit_dates(start_date:str, end_date:str, min_active_days_per_week
             commit_per_day = random.randint(min_commit_per_day, max_commit_per_day-1) # exlude the last hour
             for i in range(commit_per_day):
                 hour = random.randint(start_hour, end_hour)
-                minute = random.randint(1, 60)
-                second = random.randint(1, 60)
+                minute = random.randint(0, 59)
+                second = random.randint(0, 59)
                 commit_hours.append(f"{hour:02d}:{minute:02d}:{second:02d}")
             commit_hours.sort()
             commit_dates[active_date] = commit_hours
@@ -147,6 +151,56 @@ def create_target_file(repo_name:str) -> bool:
     return True
 
 
+def generate_random_string(size:int) -> str:
+    """Return a random string"""
+    chars = string.ascii_letters + string.digits
+    return ''.join(secrets.choice(chars) for _ in range(size))
+
+
+def make_commit(repo_name:str) -> None:
+    start_date = '2017-03-01'
+    end_date = '2017-05-31'
+    min_active_per_week = 2
+    max_active_per_week = 5
+    start_hour = 8
+    end_hour = 17
+    min_commit_per_day = 2
+    max_commit_per_day = 8
+
+    commit_dates = generate_commit_dates(start_date, end_date, min_active_per_week, max_active_per_week, start_hour, end_hour, min_commit_per_day, max_commit_per_day)
+
+    TARGET_REPO = os.path.join(LOCAL_REPO, repo_name)
+    for date in commit_dates.keys():
+        commit_hours = commit_dates[date]
+        for hour in commit_hours:
+            file_data = generate_random_string(32)
+            with open(TARGET_FILE, 'w') as target_file:
+                target_file.write(file_data)
+                target_file.close()
+            try:
+                commit_date = f"{date} {hour}"
+                commit_message = random.choice(commit_messages)
+                print()
+                print(" [+] Processing commit:")
+                print(f"   - Commit Date: {commit_date}")
+                print(f"   - File Data: {file_data}")
+                print(f"   - Commit Message: {commit_message}")
+
+                # Git add
+                subprocess.run(['git', 'add', TARGET_FILE], cwd=TARGET_REPO, check=True)
+
+                # Git commit
+                subprocess.run(['git', 'commit', '--date', commit_date, '-m', commit_message], cwd=TARGET_REPO, check=True)
+
+                # Git push
+                subprocess.run(['git', 'push'], cwd=TARGET_REPO, check=True)
+                print(" => OK")
+            except subprocess.CalledProcessError:
+                print(" => Failed")
+                traceback.print_exc()
+                return None
+
+
 def print_banner():
     pass
 
@@ -157,8 +211,7 @@ def main():
         if not is_local_repo_exist(repo_name):
             clone_repo(TEST_REPO_URL, repo_name)
         create_target_file(repo_name)
-
-
+        make_commit(repo_name)
 
 
 if __name__ == '__main__':
