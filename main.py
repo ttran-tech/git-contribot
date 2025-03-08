@@ -3,10 +3,17 @@ from itertools import filterfalse
 from messages import commit_messages
 import re, traceback, random, json, subprocess
 
+# Brief:        This file contains the main source code for git-contribot project
+#
+# Repository:   https://github.com/ttran-tech/git-contribot.git
+# Author:       ttran.tech
+# Email:        duy@ttran.tech
+# Github:       https://github.com/ttran-tech
+# 
 
 DAYS_PER_WEEK = 7
 SEC_PER_HOUR = 3600
-
+TEST_REPO_URL = 'https://github.com/ttran-tech/git-contribot-test.git'
 
 class FormatError(Exception):
     pass
