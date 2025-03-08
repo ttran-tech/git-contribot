@@ -14,6 +14,7 @@ import re, traceback, random, json, subprocess
 DAYS_PER_WEEK = 7
 SEC_PER_HOUR = 3600
 TEST_REPO_URL = 'https://github.com/ttran-tech/git-contribot-test.git'
+DUMMY_REPO_URL = 'https://github.com/ttran-tech/git-contribot-test1.git'
 
 class FormatError(Exception):
     pass
@@ -21,7 +22,6 @@ class FormatError(Exception):
 
 def generate_commit_dates(start_date:str, end_date:str, min_active_days_per_week:int, max_active_days_per_week:int, start_hour:int, end_hour:int, min_commit_per_day:int, max_commit_per_day:int) -> dict[str, list[str]]:
     """Generate a commit dates dictionary and pair each entry with a list commit hours."""
-    
     
     def _generate_active_dates(start_date:str, end_date:str, min_active_days_per_week:int, max_active_days_per_week:int) -> list[str]:
         """Generate a list of active dates"""
@@ -51,7 +51,6 @@ def generate_commit_dates(start_date:str, end_date:str, min_active_days_per_week
             next_start_date = next_end_date
         active_dates = sorted(active_dates)
         return active_dates
-
 
     def _generate_commit_hours(active_dates:list[datetime], start_hour:int, end_hour:int, min_commit_per_day:int, max_commit_per_day:int) -> dict[str,list[str]]:
         """Generate commit hours per date"""
@@ -94,9 +93,7 @@ def print_banner():
 
 
 def main():
-    test_repo = 'https://github.com/tantr-us91/git-contribot-test.git'
-
-    if is_repo_exist(test_repo):
+    if is_repo_exist(TEST_REPO_URL):
         print('Repo exist!')
 
 
