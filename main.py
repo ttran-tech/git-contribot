@@ -76,12 +76,23 @@ def generate_commit_dates(start_date:str, end_date:str, min_active_days_per_week
         return None
 
 
-def is_repo_exist(repo_url:str):
+def is_repo_exist(repo_url:str) -> bool:
+    """Check if remote repo exists"""
     try:
         subprocess.run(['git', 'ls-remote', repo_url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True) # subprocess.DEVNUL same as 2>/dev/null
         return True
     except subprocess.CalledProcessError:
         return False
+
+def extract_repo_name(repo_url:str) -> str:
+    """Extract the repo name from repo URL"""
+    try:
+        repo_name = re.search(r'/[\w-]+\.git$', repo_url).group(0)
+        repo_name = repo_name.replace('/', '').split('.')[0]
+        return repo_name
+    except AttributeError:
+        traceback.print_exc()
+        return None
 
 
 def git_clone_repo(repo_url:str):
@@ -93,8 +104,7 @@ def print_banner():
 
 
 def main():
-    if is_repo_exist(TEST_REPO_URL):
-        print('Repo exist!')
+    extract_repo_name(TEST_REPO_URL)
 
 
 
