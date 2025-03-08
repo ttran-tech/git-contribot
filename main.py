@@ -123,17 +123,18 @@ def extract_repo_name(repo_url:str) -> str:
 
 def clone_repo(repo_url:str, repo_name:str) -> bool:
     """Clone a repo to from the remote repo"""
-    print(" [+] Cloning repository ... ", end="")
-    try:
-        os.chdir(LOCAL_REPO) # change current working directory to "repo", the next line clones a remote repo in "repo" folder
-        subprocess.run(['git', 'clone', repo_url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-        if is_local_repo_exist(repo_name):
-            print("ok")
-            return True 
-    except AttributeError:
-        print("failed")
-        traceback.print_exc()
-        return False
+    if not is_local_repo_exist(repo_name):
+        print(" [+] Cloning repository ... ", end="")
+        try:
+            os.chdir(LOCAL_REPO) # change current working directory to "repo", the next line clones a remote repo in "repo" folder
+            subprocess.run(['git', 'clone', repo_url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+            if is_local_repo_exist(repo_name):
+                print("ok")
+                return True 
+        except AttributeError:
+            print("failed")
+            traceback.print_exc()
+            return False
 
 
 def create_target_file(repo_name:str) -> bool:
@@ -141,14 +142,15 @@ def create_target_file(repo_name:str) -> bool:
     global TARGET_FILE
     print(" [+] Creating target file ... ", end="")
     TARGET_FILE = os.path.join(LOCAL_REPO, f"{repo_name}/target.txt")
-    with open(TARGET_FILE, 'w') as file:
-        file.close()
-
     if not os.path.exists(TARGET_FILE):
+        with open(TARGET_FILE, 'w') as file:
+            file.close()
+        if os.path.exists(TARGET_FILE):
+            print("ok")
+            return True
         print("failed")
         raise FileNotFoundError
-    print("ok")
-    return True
+
 
 
 def generate_random_string(size:int) -> str:
@@ -160,7 +162,7 @@ def generate_random_string(size:int) -> str:
 def make_commit(repo_name:str) -> None:
     start_date = '2017-03-01'
     end_date = '2017-05-31'
-    min_active_per_week = 2
+    min_active_per_week = 1
     max_active_per_week = 5
     start_hour = 8
     end_hour = 17
@@ -187,13 +189,13 @@ def make_commit(repo_name:str) -> None:
                 print(f"   - Commit Message: {commit_message}")
 
                 # Git add
-                subprocess.run(['git', 'add', TARGET_FILE], cwd=TARGET_REPO, check=True)
+                subprocess.run(['git', 'add', TARGET_FILE], cwd=TARGET_REPO, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
 
                 # Git commit
-                subprocess.run(['git', 'commit', '--date', commit_date, '-m', commit_message], cwd=TARGET_REPO, check=True)
+                subprocess.run(['git', 'commit', '--date', commit_date, '-m', commit_message], cwd=TARGET_REPO, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
 
                 # Git push
-                subprocess.run(['git', 'push'], cwd=TARGET_REPO, check=True)
+                subprocess.run(['git', 'push'], cwd=TARGET_REPO, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
                 print(" => OK")
             except subprocess.CalledProcessError:
                 print(" => Failed")
@@ -208,8 +210,7 @@ def print_banner():
 def main():
     if is_remote_repo_exist(TEST_REPO_URL):
         repo_name = extract_repo_name(TEST_REPO_URL)
-        if not is_local_repo_exist(repo_name):
-            clone_repo(TEST_REPO_URL, repo_name)
+        clone_repo(TEST_REPO_URL, repo_name)
         create_target_file(repo_name)
         make_commit(repo_name)
 
