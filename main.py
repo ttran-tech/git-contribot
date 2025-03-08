@@ -174,7 +174,7 @@ def make_commit(repo_name:str) -> None:
     for date in commit_dates.keys():
         commit_hours = commit_dates[date]
         for hour in commit_hours:
-            file_data = generate_random_string(32)
+            file_data = generate_random_string(16)
             with open(TARGET_FILE, 'w') as target_file:
                 target_file.write(file_data)
                 target_file.close()
@@ -212,7 +212,8 @@ def print_banner():
 
 
 def user_input() -> Dict[str, str]:
-    pass
+    repo_url = input("Repository URL: ")
+    start_date = input("")
 
 
 def main():
