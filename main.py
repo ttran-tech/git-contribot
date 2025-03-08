@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from itertools import filterfalse
 from messages import commit_messages
-import re, traceback, random, json, subprocess
+import os, re, traceback, random, json, subprocess
 
 # Brief:        This file contains the main source code for git-contribot project
 #
@@ -11,10 +11,19 @@ import re, traceback, random, json, subprocess
 # Github:       https://github.com/ttran-tech
 # 
 
+# Initial setup
+BASE_DIR = os.path.dirname(__file__)
+LOCAL_REPO = os.path.join(BASE_DIR, 'repo')
+if not os.path.isdir(LOCAL_REPO):
+    os.mkdir(LOCAL_REPO, 777)
+
+###
+
 DAYS_PER_WEEK = 7
 SEC_PER_HOUR = 3600
 TEST_REPO_URL = 'https://github.com/ttran-tech/git-contribot-test.git'
 DUMMY_REPO_URL = 'https://github.com/ttran-tech/git-contribot-test1.git'
+
 
 class FormatError(Exception):
     pass
@@ -95,7 +104,7 @@ def extract_repo_name(repo_url:str) -> str:
         return None
 
 
-def git_clone_repo(repo_url:str):
+def clone_repo(repo_url:str):
     pass
 
 
