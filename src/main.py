@@ -9,19 +9,19 @@ Github:       https://github.com/ttran-tech
 from .common import print_banner, print_separator
 from .repo import is_remote_repo_exist, clone_repo
 from .core import make_commit_concurrent
-from .user_input import get_user_input
+from .config import get_user_config
 
 
 def main():
     print_banner()
-    user_input = get_user_input()
+    user_config = get_user_config()
 
-    repo_url = user_input['repo-url']
-    repo_name = user_input['repo-name']
+    repo_url = user_config['repo-url']
+    repo_name = user_config['repo-name']
     print_separator()
     if is_remote_repo_exist(repo_url):
         clone_repo(repo_url, repo_name)
-        make_commit_concurrent(user_input)
+        make_commit_concurrent(user_config)
         print("\n => Finished.")
 
 
