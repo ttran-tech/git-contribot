@@ -6,9 +6,9 @@ Author:       ttran.tech
 Email:        duy@ttran.tech
 Github:       https://github.com/ttran-tech
 """
-from .common import *
-from .repo import *
-from .core import *
+from .common import print_banner, print_separator
+from .repo import is_remote_repo_exist, clone_repo
+from .core import make_commit_concurrent
 from .user_input import get_user_input
 
 
@@ -21,17 +21,9 @@ def main():
     print_separator()
     if is_remote_repo_exist(repo_url):
         clone_repo(repo_url, repo_name)
-        commit_file = create_target_file(repo_name)
-        make_commit(user_input, commit_file)
-
-        print("\n => COMPLETED.")
+        make_commit_concurrent(user_input)
+        print("\n => Finished.")
 
 
-if __name__ == '__main__':
-    main()
-    # commit_dates = generate_commit_dates('2023-01-01', '2023-03-01', 2, 5, 8, 17, 1, 8)
-    
-    # if commit_dates:
-    #     commit_dates_json = json.dumps(commit_dates, indent=2)
-    #     print(commit_dates_json)
-    
+# if __name__ == '__main__':
+#     main()

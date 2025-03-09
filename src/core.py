@@ -14,7 +14,13 @@ import re
 import random
 import traceback
 import subprocess
+import threading
+import concurrent.futures
 
+git_lock = threading.Lock()
+
+commit_completed = 0
+commit_total = 0
 
 def generate_commit_dates(start_date:str, end_date:str, min_active_days_per_week:int, max_active_days_per_week:int, start_hour:int, end_hour:int, min_commit_per_day:int, max_commit_per_day:int) -> Dict[str, List[str]]:
     """Generate a commit dates dictionary and pair each entry with a list commit hours."""
@@ -75,21 +81,15 @@ def generate_commit_dates(start_date:str, end_date:str, min_active_days_per_week
         return None
 
 
-def make_commit(user_input:Dict, commit_file:str) -> None:
+def calculate_commit_total(commit_dates:Dict) -> int:
+    commit_total = 0
+    for _, value in commit_dates.items():
+        commit_total += len(value)
+    return commit_total
+
+
+def make_commit(local_repo_path:str, commit_dates:Dict, commit_file:str, worker_id:int) -> None:
     """Make commit to git repo"""
-    repo_name = user_input['repo-name']
-    start_date = user_input['start-date']
-    end_date = user_input['end-date']
-    min_active_day_per_week = int(user_input['min-active-days'])
-    max_active_day_per_week = int(user_input['max-active-days'])
-    start_hour = int(user_input['start-hour'])
-    end_hour = int(user_input['end-hour'])
-    min_commit_per_day = int(user_input['min-commits'])
-    max_commit_per_day = int(user_input['max-commits'])
-
-    commit_dates = generate_commit_dates(start_date, end_date, min_active_day_per_week, max_active_day_per_week, start_hour, end_hour, min_commit_per_day, max_commit_per_day)
-
-    local_repo_path = os.path.join(REPO_DIR, repo_name)
     for date in commit_dates.keys():
         commit_hours = commit_dates[date]
         for hour in commit_hours:
@@ -106,21 +106,40 @@ def make_commit(user_input:Dict, commit_file:str) -> None:
                 print(f"   - File Data: {file_data}")
                 print(f"   - Commit Message: {commit_message}")
 
-                # Git add
-                subprocess.run(['git', 'add', commit_file], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-
-                # Git commit
-                subprocess.run(['git', 'commit', '--date', commit_date, '-m', commit_message], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-
+                with  git_lock: # Lock Git operations to avoid conflicts
+                    subprocess.run(['git', 'add', commit_file], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True) # Git add
+                    subprocess.run(['git', 'commit', '--date', commit_date, '-m', commit_message], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True) # Git commit
+                    print(f" [+] Worker {worker_id} finished commits.")  
             except subprocess.CalledProcessError:
                 print(" => Failed")
                 traceback.print_exc()
                 return None
-        # Batch commit - only push after the hours already commited to reduce execution time
-        print(" [+] Push to remote repo ... ", end="")
-        subprocess.run(['git', 'push'], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-        print("OK")
+        with git_lock:
+            # Push everything after commits are done
+            print(f" => Worker {worker_id} push to remote repository ... ", end="")
+            subprocess.run(["git", "push", "origin", "main"], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+            print("OK")
 
 
-def make_commit_concurrency():
-    pass
+def make_commit_concurrent(user_input:Dict, workers=5) -> None:
+    """Run multiple workers to commit concurrently."""
+    global commit_total
+    repo_name = user_input['repo-name']
+    start_date = user_input['start-date']
+    end_date = user_input['end-date']
+    min_active_day_per_week = int(user_input['min-active-days'])
+    max_active_day_per_week = int(user_input['max-active-days'])
+    start_hour = int(user_input['start-hour'])
+    end_hour = int(user_input['end-hour'])
+    min_commit_per_day = int(user_input['min-commits'])
+    max_commit_per_day = int(user_input['max-commits'])
+
+    local_repo_path = os.path.join(REPO_DIR, repo_name)
+    commit_dates = generate_commit_dates(start_date, end_date, min_active_day_per_week, max_active_day_per_week, start_hour, end_hour, min_commit_per_day, max_commit_per_day)
+    commit_total = calculate_commit_total(commit_dates)
+    commit_files = create_commit_files(repo_name, workers)
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+        futures = [executor.submit(make_commit, local_repo_path, commit_dates, commit_file, worker_id) for worker_id, commit_file in commit_files.items()]
+        for future in concurrent.futures.as_completed(futures):
+            future.result()
