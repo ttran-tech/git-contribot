@@ -28,15 +28,15 @@ def is_local_repo_exist(repo_name:str) -> bool:
 
 def extract_repo_name(repo_url:str) -> str:
     """Extract the repo name from repo URL"""
-    print(" [+] Extracting repository name ... ", end="")
+    #print(" [+] Extracting repository name ... ", end="")
     try:
         repo_name = re.search(r'/[\w-]+\.git$', repo_url).group(0)
         repo_name = repo_name.replace('/', '').split('.')[0]
-        print("ok")
-        print(f"   => Repository Name: {repo_name}")
+        #print("ok")
+        #print(f"   => Repository Name: {repo_name}")
         return repo_name
     except AttributeError:
-        print("failed")
+        #print("failed")
         traceback.print_exc()
         return None
 
