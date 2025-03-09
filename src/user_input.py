@@ -4,6 +4,7 @@ This file handles user inputs and validation.
 from datetime import datetime
 from typing import Dict
 from .common import print_separator
+from .repo import extract_repo_name
 import re
 
 DEFAULT_VALUES = {
@@ -118,7 +119,7 @@ def get_user_input() -> Dict:
                                     lambda x: is_valid_int(x, 1), "Invalid number! Must be a positive integer.", local_default_value['max-commits'])
         user_input = {
             'repo-url': repo_url,
-            'repo-name': '',
+            'repo-name': extract_repo_name(repo_url),
             'start-date': start_date,
             'end-date': end_date,
             'min-active-days': min_active_days,
