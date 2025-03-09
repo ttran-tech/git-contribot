@@ -102,7 +102,7 @@ def make_commit(local_repo_path:str, commit_dates:Dict, commit_file:str, worker_
                 commit_date = f"{date} {hour}"
                 commit_message = random.choice(commit_messages)
                 print()
-                print(f" [#] Worker {worker_id}: processing commit:")
+                print(f" [#] Worker {worker_id}: processing commit")
                 print(f"   → Commit Date: {commit_date}")
                 print(f"   → File Data: {file_data}")
                 print(f"   → Commit Message: {commit_message}")
@@ -123,20 +123,21 @@ def make_commit(local_repo_path:str, commit_dates:Dict, commit_file:str, worker_
             print("OK")
 
 
-def make_commit_concurrent(user_input:Dict, workers=5) -> None:
+def make_commit_concurrent(user_config:Dict, workers=5) -> None:
     """Run multiple workers to commit concurrently."""
     global commit_total
-    repo_name = user_input['repo-name']
-    start_date = user_input['start-date']
-    end_date = user_input['end-date']
-    min_active_day_per_week = int(user_input['min-active-days'])
-    max_active_day_per_week = int(user_input['max-active-days'])
-    start_hour = int(user_input['start-hour'])
-    end_hour = int(user_input['end-hour'])
-    min_commit_per_day = int(user_input['min-commits'])
-    max_commit_per_day = int(user_input['max-commits'])
+    repo_name = user_config['repo-name']
+    local_repo_path = user_config['local-repo-path']
+    start_date = user_config['start-date']
+    end_date = user_config['end-date']
+    min_active_day_per_week = int(user_config['min-active-days'])
+    max_active_day_per_week = int(user_config['max-active-days'])
+    start_hour = int(user_config['start-hour'])
+    end_hour = int(user_config['end-hour'])
+    min_commit_per_day = int(user_config['min-commits'])
+    max_commit_per_day = int(user_config['max-commits'])
 
-    local_repo_path = os.path.join(REPO_DIR, repo_name)
+    
     commit_dates = generate_commit_dates(start_date, end_date, min_active_day_per_week, max_active_day_per_week, start_hour, end_hour, min_commit_per_day, max_commit_per_day)
     commit_total = calculate_commit_total(commit_dates)
     commit_files = create_commit_files(repo_name, workers)
