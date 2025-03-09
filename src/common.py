@@ -14,11 +14,8 @@ if not os.path.isdir(REPO_DIR):
     os.mkdir(REPO_DIR, 777)
 ###
 WORKERS = 5 # for concurrent
-TARGET_FILE = None
 DAYS_PER_WEEK = 7
 SEC_PER_HOUR = 3600
-TEST_REPO_URL = 'https://github.com/ttran-tech/git-contribot-test.git'
-DUMMY_REPO_URL = 'https://github.com/ttran-tech/git-contribot-test1.git'
 
 
 def generate_random_string(size:int) -> str:
