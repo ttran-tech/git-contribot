@@ -65,8 +65,9 @@ def clean_up_repo(local_repo_path:str) -> bool:
         subprocess.run(['git', 'rm', '*'], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
         subprocess.run(['git', 'commit', '-m', 'Chore: clean up repository'], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
         subprocess.run(['git', 'push'], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-        if _force_delete_local_repo(local_repo_path):
-            return True
+        return True
+        # if _force_delete_local_repo(local_repo_path):
+        #     return True
     except subprocess.CalledProcessError:
         print("failed")
     return False
