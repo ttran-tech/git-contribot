@@ -1,3 +1,6 @@
+"""
+This file handles the core logic and concurrency.
+"""
 from typing import Dict, List
 from datetime import datetime, timedelta
 from itertools import filterfalse

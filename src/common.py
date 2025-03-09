@@ -1,3 +1,6 @@
+"""
+This file contains common constants and functions used in other modules.
+"""
 import os
 import string
 import secrets

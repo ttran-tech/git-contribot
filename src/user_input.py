@@ -1,3 +1,6 @@
+"""
+This file handles user inputs and validation.
+"""
 from datetime import datetime
 import re
 

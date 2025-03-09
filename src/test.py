@@ -1,14 +1,10 @@
+"""
+This file handles all unit test purposes.
+"""
 import unittest
-from common import *
-from main import *
-
-# Brief:        This file contains the unit tests for git-contribot project.
-#
-# Repository:   https://github.com/ttran-tech/git-contribot.git
-# Author:       ttran.tech
-# Email:        duy@ttran.tech
-# Github:       https://github.com/ttran-tech
-# 
+from src.common import *
+from src.main import *
+from src.repo import *
 
 class TestGitContribot(unittest.TestCase):
     def test_is_repo_exist(self):

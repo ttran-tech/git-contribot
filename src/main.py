@@ -1,12 +1,11 @@
-
-
-# Brief:        This file contains the main source code for git-contribot project
-#
-# Repository:   https://github.com/ttran-tech/git-contribot.git
-# Author:       ttran.tech
-# Email:        duy@ttran.tech
-# Github:       https://github.com/ttran-tech
-# 
+"""
+Main entry point for the git-contribot project.
+ 
+Repository:   https://github.com/ttran-tech/git-contribot.git
+Author:       ttran.tech
+Email:        duy@ttran.tech
+Github:       https://github.com/ttran-tech
+"""
 
 def main():
     pass
