@@ -86,6 +86,12 @@ def get_prompt_set(user_input=None) -> Dict[str, str]:
     return prompt_set
 
 
+def print_user_input(user_input:Dict) -> None:
+    print_separator()
+    for key, value in user_input.items():
+        print(f" - {key.replace('-', ' ').capitalize()}: {value}")
+
+
 def get_user_input() -> Dict:
     user_input = None
     prompt_set = get_prompt_set(user_input)
@@ -131,6 +137,7 @@ def get_user_input() -> Dict:
         }
 
         # Confirmation
+        print_user_input(user_input)
         confirm = input("\n → Proceed with these settings? (Y/N): ").strip().lower()
         if confirm == 'y':
             return user_input
