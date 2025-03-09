@@ -110,7 +110,7 @@ def make_commit(local_repo_path:str, commit_dates:Dict, commit_file:str, worker_
                 with  git_lock: # Lock Git operations to avoid conflicts
                     subprocess.run(['git', 'add', commit_file], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True) # Git add
                     subprocess.run(['git', 'commit', '--date', commit_date, '-m', commit_message], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True) # Git commit
-                    print(f" [#] Worker {worker_id}: finished commits.")
+                    print(f"\n [#] Worker {worker_id}: finished commits.")
                     commit_completed+=1
             except subprocess.CalledProcessError:
                 print(" => Failed")
@@ -118,7 +118,7 @@ def make_commit(local_repo_path:str, commit_dates:Dict, commit_file:str, worker_
                 return None
         with git_lock:
             # Push everything after commits are done
-            print(f" [#] Worker {worker_id}: push to remote repository ... ", end="")
+            print(f"\n [#] Worker {worker_id}: push to remote repository ... ", end="")
             subprocess.run(["git", "push", "origin", "main"], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
             print("OK")
 
