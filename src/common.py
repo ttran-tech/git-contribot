@@ -1,6 +1,7 @@
 """
 This file contains common constants and functions used in other modules.
 """
+from typing import List
 import os
 import string
 import secrets
@@ -13,7 +14,7 @@ REPO_DIR = os.path.join(BASE_DIR, 'repo')
 if not os.path.isdir(REPO_DIR):
     os.mkdir(REPO_DIR, 777)
 ###
-WORKERS = 5 # for concurrent
+WORKERS = 3 # for concurrent
 DAYS_PER_WEEK = 7
 SEC_PER_HOUR = 3600
 
@@ -24,17 +25,20 @@ def generate_random_string(size:int) -> str:
     return ''.join(secrets.choice(chars) for _ in range(size))
 
 
-def create_target_file(repo_name:str) -> str:
+def create_commit_files(repo_name:str) -> List[str]:
     """Create a target file inside the local repo"""
     print(" [+] Creating target file ... ", end="")
-    target_file = os.path.join(REPO_DIR, f"{repo_name}/target.txt")
-    with open(target_file, 'w') as file:
-        file.close()
-    if os.path.exists(target_file):
-        print("ok")
-        return target_file
-    print("failed")
-    raise FileNotFoundError
+    commit_file_list = []
+    for _ in range(WORKERS):
+        filename = generate_random_string(16)
+        commit_file = os.path.join(REPO_DIR, f"{repo_name}/{filename}.txt")
+        with open(commit_file, 'w') as file:
+            file.close()
+        if os.path.exists(commit_file):
+            commit_file_list.append(commit_file)
+    print("ok")
+    return commit_file_list
+
     
 
 def print_banner():
