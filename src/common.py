@@ -27,19 +27,17 @@ def generate_random_string(size:int) -> str:
     return ''.join(secrets.choice(chars) for _ in range(size))
 
 
-def create_target_file(repo_name:str) -> bool:
+def create_target_file(repo_name:str) -> str:
     """Create a target file inside the local repo"""
-    global TARGET_FILE
     print(" [+] Creating target file ... ", end="")
-    TARGET_FILE = os.path.join(REPO_DIR, f"{repo_name}/target.txt")
-    if not os.path.exists(TARGET_FILE):
-        with open(TARGET_FILE, 'w') as file:
-            file.close()
-        if os.path.exists(TARGET_FILE):
-            print("ok")
-            return True
-        print("failed")
-        raise FileNotFoundError
+    target_file = os.path.join(REPO_DIR, f"{repo_name}/target.txt")
+    with open(target_file, 'w') as file:
+        file.close()
+    if os.path.exists(target_file):
+        print("ok")
+        return target_file
+    print("failed")
+    raise FileNotFoundError
     
 
 def print_banner():
