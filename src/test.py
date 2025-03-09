@@ -1,4 +1,5 @@
 import unittest
+from common import *
 from main import *
 
 # Brief:        This file contains the unit tests for git-contribot project.
