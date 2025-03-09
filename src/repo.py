@@ -1,7 +1,7 @@
 """
 This file handles repo validation and operations.
 """
-from common import *
+from .common import *
 
 import os
 import re

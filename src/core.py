@@ -5,9 +5,9 @@ from typing import Dict, List
 from datetime import datetime, timedelta
 from itertools import filterfalse
 
-from common import *
-from exceptions import FormatError
-from commit_messages import commit_messages
+from .common import *
+from .exceptions import FormatError
+from .commit_messages import commit_messages
 
 import os
 import re
