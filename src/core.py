@@ -75,16 +75,17 @@ def generate_commit_dates(start_date:str, end_date:str, min_active_days_per_week
         return None
 
 
-def make_commit(repo_name:str) -> None:
+def make_commit(user_input:Dict, commit_file:str) -> None:
     """Make commit to git repo"""
-    start_date = '2017-01-01'
-    end_date = '2017-05-31'
-    min_active_day_per_week = 4
-    max_active_day_per_week = 7
-    start_hour = 8
-    end_hour = 17
-    min_commit_per_day = 2
-    max_commit_per_day = 8
+    repo_name = user_input['repo-name']
+    start_date = user_input['start-date']
+    end_date = user_input['end-date']
+    min_active_day_per_week = int(user_input['min-active-days'])
+    max_active_day_per_week = int(user_input['max-active-days'])
+    start_hour = int(user_input['start-hour'])
+    end_hour = int(user_input['end-hour'])
+    min_commit_per_day = int(user_input['min-commits'])
+    max_commit_per_day = int(user_input['max-commits'])
 
     commit_dates = generate_commit_dates(start_date, end_date, min_active_day_per_week, max_active_day_per_week, start_hour, end_hour, min_commit_per_day, max_commit_per_day)
 
@@ -93,9 +94,9 @@ def make_commit(repo_name:str) -> None:
         commit_hours = commit_dates[date]
         for hour in commit_hours:
             file_data = generate_random_string(16)
-            with open(TARGET_FILE, 'w') as target_file:
-                target_file.write(file_data)
-                target_file.close()
+            with open(commit_file, 'w') as file:
+                file.write(file_data)
+                file.close()
             try:
                 commit_date = f"{date} {hour}"
                 commit_message = random.choice(commit_messages)
@@ -106,7 +107,7 @@ def make_commit(repo_name:str) -> None:
                 print(f"   - Commit Message: {commit_message}")
 
                 # Git add
-                subprocess.run(['git', 'add', TARGET_FILE], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+                subprocess.run(['git', 'add', commit_file], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
 
                 # Git commit
                 subprocess.run(['git', 'commit', '--date', commit_date, '-m', commit_message], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
