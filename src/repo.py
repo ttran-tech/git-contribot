@@ -7,6 +7,7 @@ import os
 import re
 import subprocess
 import traceback
+import shutil
 
 
 def is_remote_repo_exist(repo_url:str) -> bool:
@@ -55,3 +56,32 @@ def clone_repo(repo_url:str, repo_name:str) -> bool:
             print("failed")
             traceback.print_exc()
             return False
+
+
+def clean_up_repo(local_repo_path:str) -> bool:
+    """Clean up local and remote repository, remove all dummy files"""
+    print(f" [+] Cleaning up local and remote repository ... ", end="")
+    try:
+        subprocess.run(['git', 'rm', '*'], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        subprocess.run(['git', 'commit', '-m', 'Chore: clean up repository'], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        subprocess.run(['git', 'push'], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        if _force_delete_local_repo(local_repo_path):
+            return True
+    except subprocess.CalledProcessError:
+        print("failed")
+    return False
+    
+
+def _force_delete_local_repo(local_repo_path:str) -> bool:
+    """Force delete the local repository and its contents"""
+    print(" [+] Deleting local repository ... ", end="")
+    try:
+        shutil.rmtree(local_repo_path)
+        if not os.path.exists(local_repo_path):
+            print("ok")
+            return True
+    except FileNotFoundError:
+        print(f"Directory '{local_repo_path}' not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    return False
