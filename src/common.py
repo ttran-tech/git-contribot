@@ -9,7 +9,7 @@ import secrets
 VERSION = "0.1.0"
 
 # Initial setup
-BASE_DIR = os.path.dirname(__file__)
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 REPO_DIR = os.path.join(BASE_DIR, 'repo')
 if not os.path.isdir(REPO_DIR):
     os.mkdir(REPO_DIR, 777)
