@@ -90,6 +90,7 @@ def calculate_commit_total(commit_dates:Dict) -> int:
 
 def make_commit(local_repo_path:str, commit_dates:Dict, commit_file:str, worker_id:int) -> None:
     """Make commit to git repo"""
+    global commit_completed
     for date in commit_dates.keys():
         commit_hours = commit_dates[date]
         for hour in commit_hours:
@@ -101,22 +102,23 @@ def make_commit(local_repo_path:str, commit_dates:Dict, commit_file:str, worker_
                 commit_date = f"{date} {hour}"
                 commit_message = random.choice(commit_messages)
                 print()
-                print(" [+] Processing commit:")
-                print(f"   - Commit Date: {commit_date}")
-                print(f"   - File Data: {file_data}")
-                print(f"   - Commit Message: {commit_message}")
+                print(f" [#] Worker {worker_id}: processing commit:")
+                print(f"   → Commit Date: {commit_date}")
+                print(f"   → File Data: {file_data}")
+                print(f"   → Commit Message: {commit_message}")
 
                 with  git_lock: # Lock Git operations to avoid conflicts
                     subprocess.run(['git', 'add', commit_file], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True) # Git add
                     subprocess.run(['git', 'commit', '--date', commit_date, '-m', commit_message], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True) # Git commit
-                    print(f" [+] Worker {worker_id} finished commits.")  
+                    print(f" [#] Worker {worker_id}: finished commits.")
+                    commit_completed+=1
             except subprocess.CalledProcessError:
                 print(" => Failed")
                 traceback.print_exc()
                 return None
         with git_lock:
             # Push everything after commits are done
-            print(f" => Worker {worker_id} push to remote repository ... ", end="")
+            print(f" [#] Worker {worker_id}: push to remote repository ... ", end="")
             subprocess.run(["git", "push", "origin", "main"], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
             print("OK")
 
