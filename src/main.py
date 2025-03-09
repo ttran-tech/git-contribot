@@ -6,16 +6,25 @@ Author:       ttran.tech
 Email:        duy@ttran.tech
 Github:       https://github.com/ttran-tech
 """
+from .common import *
+from .repo import *
+from .core import *
+from .user_input import get_user_input
+
 
 def main():
-    pass
-    # if is_remote_repo_exist(TEST_REPO_URL):
-    #     repo_name = extract_repo_name(TEST_REPO_URL)
-    #     clone_repo(TEST_REPO_URL, repo_name)
-    #     create_target_file(repo_name)
-    #     make_commit(repo_name)
+    print_banner()
+    user_input = get_user_input()
 
-    #     print("\n => COMPLETED.")
+    repo_url = user_input['repo-url']
+    repo_name = user_input['repo-name']
+    print_separator()
+    if is_remote_repo_exist(repo_url):
+        clone_repo(repo_url, repo_name)
+        commit_file = create_target_file(repo_name)
+        make_commit(user_input, commit_file)
+
+        print("\n => COMPLETED.")
 
 
 if __name__ == '__main__':
