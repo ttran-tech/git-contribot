@@ -118,6 +118,7 @@ def get_user_input() -> Dict:
                                     lambda x: is_valid_int(x, 1), "Invalid number! Must be a positive integer.", local_default_value['max-commits'])
         user_input = {
             'repo-url': repo_url,
+            'repo-name': '',
             'start-date': start_date,
             'end-date': end_date,
             'min-active-days': min_active_days,
