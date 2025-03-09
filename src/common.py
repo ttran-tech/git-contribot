@@ -5,6 +5,7 @@ import os
 import string
 import secrets
 
+VERSION = "0.1.0"
 
 # Initial setup
 BASE_DIR = os.path.dirname(__file__)
@@ -42,4 +43,14 @@ def create_target_file(repo_name:str) -> bool:
     
 
 def print_banner():
-    pass
+    print()
+    print("┌─────────────────────────────────────────────────────────────────────────────────┐")
+    print("│                                                                                 │")
+    print("│                      _ __                  __      _ __        __               │")
+    print("│                ___ _(_) /_  _______  ___  / /_____(_) /  ___  / /_              │")
+    print("│               / _ `/ / __/ / __/ _ \/ _ \/ __/ __/ / _ \/ _ \/ __/              │")
+    print("│               \_, /_/\__/  \__/\___/_//_/\__/_/ /_/_.__/\___/\__/               │")
+    print("│              /___/                                                              │")
+    print(f"│                                        Developed by ttran.tech | {VERSION}          │")
+    print("└─────────────────────────────────────────────────────────────────────────────────┘")
+    print()
