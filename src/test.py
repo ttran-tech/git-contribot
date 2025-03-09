@@ -2,9 +2,9 @@
 This file handles all unit test purposes.
 """
 import unittest
-from src.common import *
-from src.main import *
-from src.repo import *
+from common import *
+from main import *
+from .repo import *
 
 class TestGitContribot(unittest.TestCase):
     def test_is_repo_exist(self):
