@@ -3,8 +3,9 @@ This file handles user inputs and validation.
 """
 from datetime import datetime
 from typing import Dict
-from .common import print_separator
+from .common import REPO_DIR, print_separator
 from .repo import extract_repo_name
+import os
 import re
 
 DEFAULT_VALUES = {
@@ -22,12 +23,12 @@ DEFAULT_VALUES = {
 def get_valid_input(prompt:str, validation_fn, error_message:str, default_value=None) -> str:
     """Generic function to get valid input from the user."""
     while True:
-        user_input = input(prompt).strip()
-        if user_input == '':
+        user_config = input(prompt).strip()
+        if user_config == '':
             if default_value:
-                user_input = default_value
-        if validation_fn(user_input):
-            return user_input
+                user_config = default_value
+        if validation_fn(user_config):
+            return user_config
         print(f"\n [x] {error_message}")
 
 
@@ -57,9 +58,9 @@ def is_valid_repo_url(url) -> bool:
     return bool(git_url_pattern.match(url))
 
 
-def get_prompt_set(user_input=None) -> Dict[str, str]:
+def get_prompt_set(user_config=None) -> Dict[str, str]:
     prompt_set = {}
-    if user_input is None:
+    if user_config is None:
         prompt_set = {
             'repo-url': "\n → Enter your GitHub repository URL (e.g., https://github.com/user/repo.git)\n > ",
             'start-date': "\n → Enter the starting date (YYYY-MM-DD)\n > ",
@@ -73,28 +74,28 @@ def get_prompt_set(user_input=None) -> Dict[str, str]:
         }
     else:
         prompt_set = {
-            'repo-url': f"\n → Enter your GitHub repository URL [Repository URL: {user_input['repo-url']}, Enter to skip]\n > ",
-            'start-date': f"\n → Enter the starting date (YYYY-MM-DD) [Starting date: {user_input['start-date']}, Enter to skip]\n > ",
-            'end-date': f"\n → Enter the last date to make a commit (YYYY-MM-DD) [Ending date: {user_input['end-date']}, Enter to skip]\n > ",
-            'min-active-days': f"\n → Enter the minimum active days per week (1-7) [Min. active days: {user_input['min-active-days']}, Enter to skip]\n > ",
-            'max-active-days': f"\n → Enter the maximum active days per week (1-7) [Max. active days: {user_input['max-active-days']}, Enter to skip]\n > ",
-            'start-hour': f"\n → Enter the starting hour for commits per day (0-23) [Start hour: {user_input['start-hour']}, Enter to skip]\n > ",
-            'end-hour': f"\n → Enter the ending hour for commits per day (0-23) [End hour: {user_input['end-hour']}, Enter to skip]\n > ",
-            'min-commits': f"\n → Enter the minimum number of commits per day [Min. commits: {user_input['min-commits']}, Enter to skip]\n > ",
-            'max-commits': f"\n → Enter the maximum number of commits per day [Max. commits: {user_input['max-commits']}, Enter to skip]\n > ",
+            'repo-url': f"\n → Enter your GitHub repository URL [Repository URL: {user_config['repo-url']}, Enter to skip]\n > ",
+            'start-date': f"\n → Enter the starting date (YYYY-MM-DD) [Starting date: {user_config['start-date']}, Enter to skip]\n > ",
+            'end-date': f"\n → Enter the last date to make a commit (YYYY-MM-DD) [Ending date: {user_config['end-date']}, Enter to skip]\n > ",
+            'min-active-days': f"\n → Enter the minimum active days per week (1-7) [Min. active days: {user_config['min-active-days']}, Enter to skip]\n > ",
+            'max-active-days': f"\n → Enter the maximum active days per week (1-7) [Max. active days: {user_config['max-active-days']}, Enter to skip]\n > ",
+            'start-hour': f"\n → Enter the starting hour for commits per day (0-23) [Start hour: {user_config['start-hour']}, Enter to skip]\n > ",
+            'end-hour': f"\n → Enter the ending hour for commits per day (0-23) [End hour: {user_config['end-hour']}, Enter to skip]\n > ",
+            'min-commits': f"\n → Enter the minimum number of commits per day [Min. commits: {user_config['min-commits']}, Enter to skip]\n > ",
+            'max-commits': f"\n → Enter the maximum number of commits per day [Max. commits: {user_config['max-commits']}, Enter to skip]\n > ",
         }
     return prompt_set
 
 
-def print_user_input(user_input:Dict) -> None:
+def print_user_config(user_config:Dict) -> None:
     print_separator()
-    for key, value in user_input.items():
+    for key, value in user_config.items():
         print(f" - {key.replace('-', ' ').capitalize()}: {value}")
 
 
-def get_user_input() -> Dict:
-    user_input = None
-    prompt_set = get_prompt_set(user_input)
+def get_user_config() -> Dict:
+    user_config = None
+    prompt_set = get_prompt_set(user_config)
     local_default_value = DEFAULT_VALUES
     while True:
         repo_url = get_valid_input(prompt_set['repo-url'],
@@ -123,9 +124,11 @@ def get_user_input() -> Dict:
 
         max_commits = get_valid_input(prompt_set['max-commits'], 
                                     lambda x: is_valid_int(x, 1), "Invalid number! Must be a positive integer.", local_default_value['max-commits'])
-        user_input = {
+        repo_name = extract_repo_name(repo_url)
+        user_config = {
             'repo-url': repo_url,
-            'repo-name': extract_repo_name(repo_url),
+            'repo-name': repo_name,
+            'local-repo-path': os.path.join(REPO_DIR, repo_name),
             'start-date': start_date,
             'end-date': end_date,
             'min-active-days': min_active_days,
@@ -137,11 +140,11 @@ def get_user_input() -> Dict:
         }
 
         # Confirmation
-        print_user_input(user_input)
+        print_user_config(user_config)
         confirm = input("\n → Proceed with these settings? (Y/N): ").strip().lower()
         if confirm == 'y':
-            return user_input
+            return user_config
         else:
-            prompt_set = get_prompt_set(user_input)
-            local_default_value = user_input
+            prompt_set = get_prompt_set(user_config)
+            local_default_value = user_config
             print_separator()
