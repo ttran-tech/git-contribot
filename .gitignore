@@ -178,3 +178,7 @@ cython_debug/
 
 # vscode config files
 .vscode
+
+repo/
+
+src/repo/
