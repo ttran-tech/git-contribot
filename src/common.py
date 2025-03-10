@@ -6,6 +6,7 @@ import os
 import string
 import secrets
 import platform
+import sys
 
 VERSION = "0.1.0"
 
@@ -63,3 +64,11 @@ def print_separator():
     print()
     print("───────────────────────────────────────────────────────────────────────────────────")
     print()
+
+
+def supported_os() -> bool:
+    if CURRENT_OS == "Windows":
+        return True
+    print(" ⚠ This tools currently supports Windows only.")
+    print()
+    sys.exit(1)
