@@ -12,7 +12,7 @@ VERSION = "0.1.0"
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 REPO_DIR = os.path.join(BASE_DIR, 'repo')
 if not os.path.isdir(REPO_DIR):
-    os.mkdir(REPO_DIR, 777)
+    os.makedirs(REPO_DIR, mode=0o777)
 ###
 DAYS_PER_WEEK = 7
 SEC_PER_HOUR = 3600
