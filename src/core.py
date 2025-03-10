@@ -1,21 +1,22 @@
 """
 This file handles the core logic and concurrency.
 """
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from datetime import datetime, timedelta
 from itertools import filterfalse
+from queue import Queue
 
 from .common import *
 from .exceptions import FormatError
 from .commit_messages import commit_messages
 
-import os
 import re
 import random
 import traceback
 import subprocess
 import threading
 import concurrent.futures
+
 
 git_lock = threading.Lock()
 
@@ -125,7 +126,6 @@ def make_commit(local_repo_path:str, commit_dates:Dict, commit_file:str, worker_
 
 def make_commit_concurrent(user_config:Dict, workers=5) -> None:
     """Run multiple workers to commit concurrently."""
-    global commit_total
     repo_name = user_config['repo-name']
     local_repo_path = user_config['local-repo-path']
     start_date = user_config['start-date']
@@ -139,10 +139,100 @@ def make_commit_concurrent(user_config:Dict, workers=5) -> None:
 
     
     commit_dates = generate_commit_dates(start_date, end_date, min_active_day_per_week, max_active_day_per_week, start_hour, end_hour, min_commit_per_day, max_commit_per_day)
-    commit_total = calculate_commit_total(commit_dates)
     commit_files = create_commit_files(repo_name, workers)
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
         futures = [executor.submit(make_commit, local_repo_path, commit_dates, commit_file, worker_id) for worker_id, commit_file in commit_files.items()]
+        for future in concurrent.futures.as_completed(futures):
+            future.result()
+
+
+# The version below is in developing and testing
+def make_commit_v2(local_repo_path:str, commit_queue:Queue[Tuple[str,str]], commit_file:str, worker_id:int, batch_size=5) -> None:
+    """Update remote repository"""
+    global commit_completed
+    commit_count = 0
+
+    # WHILE commit_queue is NOT empty
+    while not commit_queue.empty():
+        # Retrieve (date, hour) from commit_queue.
+        date, hour = commit_queue.get()
+
+        # Generate random commit file content.
+        file_data = generate_random_string(16)
+        with open(commit_file, 'w') as file:
+            file.write(file_data)
+            file.close()
+
+        try:
+            commit_date = f"{date} {hour}"
+            commit_message = random.choice(commit_messages)
+            print()
+            print(f" [#] Worker {worker_id}: Executing 'git commit'")
+            print(f"   → Commit Date: {commit_date}")
+            print(f"   → File Data: {file_data}")
+            print(f"   → Commit Message: {commit_message}")
+
+            with git_lock: # Lock Git operations to avoid conflicts
+                subprocess.run(['git', 'add', commit_file], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True) # git add
+                subprocess.run(['git', 'commit', '--date', commit_date, '-m', commit_message], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True) # git commit
+                
+                commit_completed+=1
+                commit_count+=1
+                
+                print(f"\n [#] Worker {worker_id}: Commit done. Completed {commit_completed} / {commit_total} commits.")
+
+                if commit_count == batch_size:
+                    print(f"\n [#] Worker {worker_id}: Executing 'git push' ... ", end="")
+                    subprocess.run(["git", "push", "origin", "main"], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True) # git push
+                    commit_count = 0 # reset commit_count
+                    print("OK")
+        except subprocess.CalledProcessError:
+            print(" => Failed")
+            traceback.print_exc()
+            
+        commit_queue.task_done()
+    # Finalize - push all remain commits to remote repo
+    if commit_count > 0 and commit_completed < commit_total:
+        print(f"\n [#] Worker {worker_id}: Finalizing... ", end="")
+        subprocess.run(["git", "push", "origin", "main"], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        print("OK")
+
+
+def make_commit_concurrent_v2(user_config:Dict, workers=5) -> None:
+    """Run multiple workers to commit concurrently"""
+    global commit_total
+
+    # Extract necessary data from user_config
+    repo_name = user_config['repo-name']
+    local_repo_path = user_config['local-repo-path']
+    start_date = user_config['start-date']
+    end_date = user_config['end-date']
+    min_active_day_per_week = int(user_config['min-active-days'])
+    max_active_day_per_week = int(user_config['max-active-days'])
+    start_hour = int(user_config['start-hour'])
+    end_hour = int(user_config['end-hour'])
+    min_commit_per_day = int(user_config['min-commits'])
+    max_commit_per_day = int(user_config['max-commits'])
+
+    # Generate commit_dates dictionary using generate_commit_dates()
+    commit_dates = generate_commit_dates(start_date, end_date, min_active_day_per_week, max_active_day_per_week, start_hour, end_hour, min_commit_per_day, max_commit_per_day)
+    
+    # Create a Queue object to store individual commit tasks
+    commit_queue = Queue()
+    
+    # Populate the Queue
+    for date in commit_dates:
+        for hour in commit_dates[date]:
+            commit_queue.put((date, hour))
+    commit_total = commit_queue.qsize()
+
+    # Create commit_files mapping (one per worker)
+    commit_files = create_commit_files(repo_name, workers)
+
+    # Start ThreadPoolExecutor with 'workers' number of workers:
+    #     - Submit make_commit(worker_id) for each worker.
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+        futures = [executor.submit(make_commit_v2, local_repo_path, commit_queue, commit_file, worker_id) for worker_id, commit_file in commit_files.items()]
         for future in concurrent.futures.as_completed(futures):
             future.result()
