@@ -47,8 +47,8 @@ def clone_repo(repo_url:str, repo_name:str) -> bool:
     if not is_local_repo_exist(repo_name):
         print(" [+] Cloning repository ... ", end="")
         try:
-            os.chdir(REPO_DIR) # change current working directory to "repo", the next line clones a remote repo in "repo" folder
-            subprocess.run(['git', 'clone', repo_url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+            #os.chdir(REPO_DIR) # change current working directory to "repo", the next line clones a remote repo in "repo" folder
+            subprocess.run(['git', 'clone', repo_url], cwd=REPO_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
             if is_local_repo_exist(repo_name):
                 print("ok")
                 return True 
