@@ -13,7 +13,7 @@ DEFAULT_VALUES = {
     'start-date': '',
     'end-date': '',
     'min-active-days': '2',
-    'max-active-days': '6',
+    'max-active-days': '7',
     'start-hour': '8',
     'end-hour': '17',
     'min-commits': '5',
