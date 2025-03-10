@@ -5,14 +5,19 @@ from typing import Dict
 import os
 import string
 import secrets
+import platform
 
 VERSION = "0.1.0"
 
+
 # Initial setup
+CURRENT_OS = platform.system()
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 REPO_DIR = os.path.join(BASE_DIR, 'repo')
 if not os.path.isdir(REPO_DIR):
     os.makedirs(REPO_DIR, mode=0o777)
+    if CURRENT_OS == 'Linux':
+        os.system(f"chmod 777 {REPO_DIR}")
 ###
 DAYS_PER_WEEK = 7
 SEC_PER_HOUR = 3600
