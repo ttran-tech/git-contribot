@@ -71,6 +71,7 @@ def get_prompt_set(user_config=None) -> Dict[str, str]:
     if user_config is None:
         prompt_set = {
             'repo-url': "\n → Enter your GitHub repository URL (e.g., https://github.com/user/repo.git)\n > ",
+            'pat': "\n → Enter GitHub Personal Access Token (PAT):\n > ",
             'start-date': "\n → Enter the starting date (YYYY-MM-DD)\n > ",
             'end-date': "\n → Enter the last date to make a commit (YYYY-MM-DD)\n > ",
             'min-active-days': f"\n → Enter the minimum active days per week (1-7) [Default: {DEFAULT_VALUES['min-active-days']}, press Enter]\n > ",
@@ -83,6 +84,7 @@ def get_prompt_set(user_config=None) -> Dict[str, str]:
     else:
         prompt_set = {
             'repo-url': f"\n → Enter your GitHub repository URL [Repository URL: {user_config['repo-url']}, Enter to skip]\n > ",
+            'pat': "\n → Enter GitHub Personal Access Token (PAT):\n > ",
             'start-date': f"\n → Enter the starting date (YYYY-MM-DD) [Starting date: {user_config['start-date']}, Enter to skip]\n > ",
             'end-date': f"\n → Enter the last date to make a commit (YYYY-MM-DD) [Ending date: {user_config['end-date']}, Enter to skip]\n > ",
             'min-active-days': f"\n → Enter the minimum active days per week (1-7) [Min. active days: {user_config['min-active-days']}, Enter to skip]\n > ",
@@ -113,7 +115,7 @@ def get_user_config() -> Dict:
                                 is_valid_repo_url, "Invalid GitHub repository URL! Format: https://github.com/user/repo.git", local_default_value['repo-url'])
 
         if USER_OS == "Linux":
-            pat = getpass.getpass("\n → Enter GitHub Personal Access Token (PAT):\n")
+            pat = getpass.getpass(prompt_set['pat'])
 
         start_date = get_valid_input(prompt_set['start-date'], 
                                     is_valid_date, "Invalid date format! Please use YYYY-MM-DD.", local_default_value['start-date'])
