@@ -99,7 +99,7 @@ def get_prompt_set(user_config=None) -> Dict[str, str]:
 
 def print_user_config(user_config:Dict) -> None:
     print_separator()
-    exclude_fields = ['local-repo-path', 'username', 'pat']
+    exclude_fields = ['local-repo-path', 'username', 'pat', 'push-url']
     for key, value in user_config.items():
         if key not in exclude_fields:
             print(f" - {key.replace('-', ' ').capitalize()}: {value}")
