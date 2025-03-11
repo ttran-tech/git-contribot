@@ -44,6 +44,5 @@ def open_os():
     if is_remote_repo_exist(repo_url):
         clone_repo(repo_url, repo_name)
         make_commit_concurrent_v2(user_config)
-        cleanup_repo(local_repo_path)
         cleanup_repo(local_repo_path, push_url)
         print("\n → Finished.")
