@@ -190,13 +190,13 @@ def make_commit_v2(local_repo_path:str, commit_queue:Queue[Tuple[str,str]], comm
         except subprocess.CalledProcessError:
             print(" => Failed")
             traceback.print_exc()
-            
         commit_queue.task_done()
+        print(f"\n [#] Worker {worker_id}: Completed all commits")
     # Finalize - push all remain commits to remote repo
-    if commit_count > 0 and commit_completed < commit_total:
-        print(f"\n [#] Worker {worker_id}: Finalizing... ", end="")
-        subprocess.run(["git", "push", push_url, "main"], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-        print("OK")
+    # if commit_count > 0 and commit_completed < commit_total:
+    #     print(f"\n [#] Worker {worker_id}: Finalizing... ", end="")
+    #     subprocess.run(["git", "push", push_url, "main"], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+    #     print("OK")
 
 
 def make_commit_concurrent_v2(user_config:Dict, workers=5) -> None:
@@ -237,3 +237,9 @@ def make_commit_concurrent_v2(user_config:Dict, workers=5) -> None:
         futures = [executor.submit(make_commit_v2, local_repo_path, commit_queue, commit_file, worker_id, push_url) for worker_id, commit_file in commit_files.items()]
         for future in concurrent.futures.as_completed(futures):
             future.result()
+
+    # Let the main thread handle the last push
+    if commit_completed < commit_total:
+        print(f"\n [#] Main Thread: Finalizing... ", end="")
+        subprocess.run(["git", "push", push_url, "main"], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        print("OK")
