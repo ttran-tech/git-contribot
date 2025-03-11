@@ -8,6 +8,7 @@ from .repo import extract_repo_name
 import os
 import re
 
+DEBUG = True
 DEFAULT_VALUES = {
     'repo-url': '',
     'start-date': '',
@@ -19,6 +20,12 @@ DEFAULT_VALUES = {
     'min-commits': '5',
     'max-commits': '20',
 }
+
+if DEBUG:
+    DEFAULT_VALUES['repo-url'] = 'https://github.com/ttran-tech/git-contribot-test-v1.git'
+    DEFAULT_VALUES['start-date'] = '2016-01-01'
+    DEFAULT_VALUES['end-date'] = '2016-01-15'
+
 
 def get_valid_input(prompt:str, validation_fn, error_message:str, default_value=None) -> str:
     """Generic function to get valid input from the user."""
