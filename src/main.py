@@ -22,11 +22,12 @@ def windows_only():
         repo_url = user_config['repo-url']
         repo_name = user_config['repo-name']
         local_repo_path = user_config['local-repo-path']
+        push_url = user_config['push-url']
         print_separator()
         if is_remote_repo_exist(repo_url):
             clone_repo(repo_url, repo_name)
             make_commit_concurrent_v2(user_config)
-            cleanup_repo(local_repo_path)
+            cleanup_repo(local_repo_path, push_url)
             print("\n → Finished.")
 
 
@@ -38,9 +39,11 @@ def open_os():
     repo_url = user_config['repo-url']
     repo_name = user_config['repo-name']
     local_repo_path = user_config['local-repo-path']
+    push_url = user_config['push-url']
     print_separator()
     if is_remote_repo_exist(repo_url):
         clone_repo(repo_url, repo_name)
         make_commit_concurrent_v2(user_config)
         cleanup_repo(local_repo_path)
+        cleanup_repo(local_repo_path, push_url)
         print("\n → Finished.")

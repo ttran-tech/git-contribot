@@ -58,13 +58,13 @@ def clone_repo(repo_url:str, repo_name:str) -> bool:
             return False
 
 
-def cleanup_repo(local_repo_path:str) -> bool:
+def cleanup_repo(local_repo_path:str, push_url:str) -> bool:
     """Clean up local and remote repository, remove all dummy files"""
     print(f"\n [+] Cleaning up local and remote repository ... ", end="")
     try:
         subprocess.run(['git', 'rm', '*'], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
         subprocess.run(['git', 'commit', '-m', 'Chore: clean up repository'], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-        subprocess.run(['git', 'push'], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        subprocess.run(['git', 'push', push_url, 'main'], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
         print("ok")
         print("\n → Local repository cleanup completed.")
         print("\n ⚠ Note: The directory still exists. Delete it manually if necessary.")
