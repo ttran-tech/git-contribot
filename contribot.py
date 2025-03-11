@@ -6,7 +6,8 @@ Author:       ttran.tech
 Email:        duy@ttran.tech
 Github:       https://github.com/ttran-tech
 """
-from src.main import main
+from src.main import windows_only, open_os
 
 if __name__ == '__main__':
-    main()
+    # windows_only()
+    open_os()
