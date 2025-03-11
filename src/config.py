@@ -3,7 +3,7 @@ This file handles user inputs and validation.
 """
 from datetime import datetime
 from typing import Dict
-from .common import REPO_DIR, USER_OS, print_separator, extract_username
+from .common import REPO_DIR, USER_OS, print_separator, create_push_url
 from .repo import extract_repo_name
 import os
 import re
@@ -110,12 +110,14 @@ def get_user_config() -> Dict:
     prompt_set = get_prompt_set(user_config)
     local_default_value = DEFAULT_VALUES
     pat = ''
+    push_url = 'origin'
     while True:
         repo_url = get_valid_input(prompt_set['repo-url'],
                                 is_valid_repo_url, "Invalid GitHub repository URL! Format: https://github.com/user/repo.git", local_default_value['repo-url'])
 
         if USER_OS == "Linux":
             pat = getpass.getpass(prompt_set['pat'])
+            push_url = create_push_url(repo_url, pat)
 
         start_date = get_valid_input(prompt_set['start-date'], 
                                     is_valid_date, "Invalid date format! Please use YYYY-MM-DD.", local_default_value['start-date'])
@@ -142,14 +144,12 @@ def get_user_config() -> Dict:
                                     lambda x: is_valid_int(x, 1), "Invalid number! Must be a positive integer.", local_default_value['max-commits'])
         
         repo_name = extract_repo_name(repo_url)
-        username = extract_username(repo_url)
         local_repo_path = os.path.join(REPO_DIR, repo_name)
 
         user_config = {
             'repo-url': repo_url,
             'repo-name': repo_name,
-            'username': username,
-            'pat': pat,
+            'push-url': push_url,
             'local-repo-path': local_repo_path,
             'start-date': start_date,
             'end-date': end_date,

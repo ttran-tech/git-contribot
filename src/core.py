@@ -148,7 +148,7 @@ def make_commit_concurrent(user_config:Dict, workers=5) -> None:
 
 
 # The version below is in developing and testing
-def make_commit_v2(local_repo_path:str, commit_queue:Queue[Tuple[str,str]], commit_file:str, worker_id:int, batch_size=5) -> None:
+def make_commit_v2(local_repo_path:str, commit_queue:Queue[Tuple[str,str]], commit_file:str, worker_id:int, push_url:str, batch_size:int=5) -> None:
     """Update remote repository"""
     global commit_completed
     commit_count = 0
@@ -184,7 +184,7 @@ def make_commit_v2(local_repo_path:str, commit_queue:Queue[Tuple[str,str]], comm
 
                 if commit_count == batch_size:
                     print(f"\n [#] Worker {worker_id}: Executing 'git push' ... ", end="")
-                    subprocess.run(["git", "push", "origin", "main"], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True) # git push
+                    subprocess.run(["git", "push", push_url, "main"], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True) # git push
                     commit_count = 0 # reset commit_count
                     print("OK")
         except subprocess.CalledProcessError:
@@ -195,7 +195,7 @@ def make_commit_v2(local_repo_path:str, commit_queue:Queue[Tuple[str,str]], comm
     # Finalize - push all remain commits to remote repo
     if commit_count > 0 and commit_completed < commit_total:
         print(f"\n [#] Worker {worker_id}: Finalizing... ", end="")
-        subprocess.run(["git", "push", "origin", "main"], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        subprocess.run(["git", "push", push_url, "main"], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
         print("OK")
 
 
@@ -205,6 +205,7 @@ def make_commit_concurrent_v2(user_config:Dict, workers=5) -> None:
 
     # Extract necessary data from user_config
     repo_name = user_config['repo-name']
+    push_url = user_config['push-url']
     local_repo_path = user_config['local-repo-path']
     start_date = user_config['start-date']
     end_date = user_config['end-date']
@@ -233,6 +234,6 @@ def make_commit_concurrent_v2(user_config:Dict, workers=5) -> None:
     # Start ThreadPoolExecutor with 'workers' number of workers:
     #     - Submit make_commit(worker_id) for each worker.
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-        futures = [executor.submit(make_commit_v2, local_repo_path, commit_queue, commit_file, worker_id) for worker_id, commit_file in commit_files.items()]
+        futures = [executor.submit(make_commit_v2, local_repo_path, commit_queue, commit_file, worker_id, push_url) for worker_id, commit_file in commit_files.items()]
         for future in concurrent.futures.as_completed(futures):
             future.result()
