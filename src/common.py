@@ -47,7 +47,12 @@ def create_commit_files(repo_name:str, workers:int) -> Dict[int, str]:
 
 def extract_username(repo_url:str) -> str:
     """Extract username from repo URL"""
-    return ((repo_url.replace("https://github.com/", "")).split("/")[0]).strip()    
+    return ((repo_url.replace("https://github.com/", "")).split("/")[0]).strip()
+
+
+def create_push_url(repo_url:str, pat:str) -> str:
+    """Build git push url for Linux user"""
+    return repo_url.replace("https://", f"https://{extract_username(repo_url)}:{pat}@")
 
 
 def print_banner():
