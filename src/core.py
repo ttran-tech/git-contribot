@@ -242,4 +242,4 @@ def make_commit_concurrent_v2(user_config:Dict, workers=5) -> None:
     if commit_completed < commit_total:
         print(f"\n [#] Main Thread: Finalizing... ", end="")
         subprocess.run(["git", "push", push_url, "main"], cwd=local_repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-        print("OK")
+        print(f"OK | Completed {commit_completed} / {commit_total} commits.")
