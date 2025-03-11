@@ -44,7 +44,11 @@ def create_commit_files(repo_name:str, workers:int) -> Dict[int, str]:
     print("ok")
     return commit_files
 
-    
+
+def extract_username(repo_url:str) -> str:
+    """Extract username from repo URL"""
+    return ((repo_url.replace("https://github.com/", "")).split("/")[0]).strip()    
+
 
 def print_banner():
     print()
