@@ -3,10 +3,11 @@ This file handles user inputs and validation.
 """
 from datetime import datetime
 from typing import Dict
-from .common import REPO_DIR, print_separator
+from .common import REPO_DIR, USER_OS, print_separator, extract_username
 from .repo import extract_repo_name
 import os
 import re
+import getpass
 
 DEBUG = True
 DEFAULT_VALUES = {
@@ -96,17 +97,23 @@ def get_prompt_set(user_config=None) -> Dict[str, str]:
 
 def print_user_config(user_config:Dict) -> None:
     print_separator()
+    exclude_fields = ['local-repo-path', 'username', 'pat']
     for key, value in user_config.items():
-        print(f" - {key.replace('-', ' ').capitalize()}: {value}")
+        if key not in exclude_fields:
+            print(f" - {key.replace('-', ' ').capitalize()}: {value}")
 
 
 def get_user_config() -> Dict:
     user_config = None
     prompt_set = get_prompt_set(user_config)
     local_default_value = DEFAULT_VALUES
+    pat = ''
     while True:
         repo_url = get_valid_input(prompt_set['repo-url'],
                                 is_valid_repo_url, "Invalid GitHub repository URL! Format: https://github.com/user/repo.git", local_default_value['repo-url'])
+
+        if USER_OS == "Linux":
+            pat = getpass.getpass("\n → Enter GitHub Personal Access Token (PAT):\n")
 
         start_date = get_valid_input(prompt_set['start-date'], 
                                     is_valid_date, "Invalid date format! Please use YYYY-MM-DD.", local_default_value['start-date'])
@@ -131,11 +138,17 @@ def get_user_config() -> Dict:
 
         max_commits = get_valid_input(prompt_set['max-commits'], 
                                     lambda x: is_valid_int(x, 1), "Invalid number! Must be a positive integer.", local_default_value['max-commits'])
+        
         repo_name = extract_repo_name(repo_url)
+        username = extract_username(repo_url)
+        local_repo_path = os.path.join(REPO_DIR, repo_name)
+
         user_config = {
             'repo-url': repo_url,
             'repo-name': repo_name,
-            'local-repo-path': os.path.join(REPO_DIR, repo_name),
+            'username': username,
+            'pat': pat,
+            'local-repo-path': local_repo_path,
             'start-date': start_date,
             'end-date': end_date,
             'min-active-days': min_active_days,
