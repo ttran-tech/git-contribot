@@ -145,7 +145,7 @@ Pull requests are welcome! Feel free to suggest improvements or report issues.
 - The author is **not responsible** for any misuse of this tool.
 
 ## 📜 License
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](LICENSE).
 
 ## 📌 Future Improvements
 ✅ Simulate pull requests & branch merges
