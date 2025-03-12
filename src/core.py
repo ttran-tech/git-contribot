@@ -56,7 +56,15 @@ def generate_commit_dates(start_date:str, end_date:str, min_active_days_per_week
             # Ensure at least 3 ~ 6 active days per week dynamically
             adjusted_min_days = max(min_active_days_per_week, min(3, days_in_week // 2))
             adjusted_max_days = min(max_active_days_per_week, days_in_week)
-            active_date_per_week = random.randint(adjusted_min_days, adjusted_max_days)
+
+            print(f"adjusted_min_days: {adjusted_min_days} | adjusted_max_days: {adjusted_max_days}")
+
+            active_date_per_week = None
+
+            if adjusted_min_days < adjusted_max_days:
+                active_date_per_week = random.randint(adjusted_min_days, adjusted_max_days)
+            else:
+                active_date_per_week = random.randint(adjusted_max_days, adjusted_min_days)
             
             dates = [(next_start_date + timedelta(days=n)) for n in range(days_in_week)]
             for _ in range(active_date_per_week):
