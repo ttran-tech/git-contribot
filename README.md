@@ -80,7 +80,7 @@ python contribot.py
 ![](docs/git_contribot.png)
 
 ### :pushpin: Required User Input
-| Field | Description |
+| Fields | Description |
 |---|---|
 |**GitHub Repository URL**| The HTTPS URL of your GitHub repository (e.g., `https://github.com/user/repo.git`).|
 |**GitHub Personal Access Token** *(Linux Only)*|If running on Linux, you will be prompted for a PAT to authenticate Git operations.|
@@ -88,8 +88,8 @@ python contribot.py
 |**Ending Date**|The last date to generate commits (format: `YYYY-MM-DD`).|
 |**Minimum Active Days per Week**|The minimum number of days in a week where commits should be made. (default: `2`)|
 |**Maximum Active Days per Week**|The maximum number of active commit days per week (default: `7`, meaning commits every day).|
-|**Starting Hour**|The earliest hour of the day when commits can start (default is `8 A`M, 24-hour format).|
-|**Ending Hour**|The latest hour of the day when commits can be made (default is `17 PM`).|
+|**Starting Hour**|The earliest hour of the day when commits can start, using 24-hour format (default: `8` for 8:00 AM).|
+|**Ending Hour**|The latest hour of the day when commits can be made, using 24-hour format (default: `17` for 17:00 PM).|
 |**Minimum Commits per Day**|The minimum number of commits that will be made on an active day (default: `5`).|
 |**Maximum Commits per Day**|The maximum number of commits that can be made on an active day (default: `20`).|
 
