@@ -9,7 +9,7 @@ import os
 import re
 import getpass
 
-DEBUG = True
+# DEBUG = False
 DEFAULT_VALUES = {
     'repo-url': '',
     'start-date': '',
@@ -22,10 +22,10 @@ DEFAULT_VALUES = {
     'max-commits': '20',
 }
 
-if DEBUG:
-    DEFAULT_VALUES['repo-url'] = 'https://github.com/ttran-tech/git-contribot-test-v1.git'
-    DEFAULT_VALUES['start-date'] = '2016-01-01'
-    DEFAULT_VALUES['end-date'] = '2016-01-15'
+# if DEBUG:
+#     DEFAULT_VALUES['repo-url'] = 'https://github.com/ttran-tech/git-contribot-test-v1.git'
+#     DEFAULT_VALUES['start-date'] = '2016-01-01'
+#     DEFAULT_VALUES['end-date'] = '2016-01-15'
 
 
 def get_valid_input(prompt:str, validation_fn, error_message:str, default_value=None) -> str:
