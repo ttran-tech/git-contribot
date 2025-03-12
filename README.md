@@ -74,7 +74,6 @@ git --version
 :four: Run the script
 
 ```Powershell
-cd git-contribot
 python contribot.py
 ```
 
