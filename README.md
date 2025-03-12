@@ -78,6 +78,8 @@ cd git-contribot
 python contribot.py
 ```
 
+![](docs/git_contribot.png)
+
 ### :pushpin: Required User Input
 | Field | Description |
 |---|---|
