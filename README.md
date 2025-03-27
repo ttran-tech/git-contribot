@@ -7,15 +7,15 @@
 **git-contribot** is a Python automation tool designed to fill your GitHub activity graph with past commits.
 It allows you to generate commits on specific past dates, simulating a natural-looking contribution history.
 
-🔹 Generate realistic commit histories based on user-defined parameters.
+- Generate realistic commit histories based on user-defined parameters.
 
-🔹 Supports concurrent execution for fast commit generation.
+- Supports concurrent execution for fast commit generation.
 
-🔹 Automatically pushes commits to a GitHub repository.
+- Automatically pushes commits to a GitHub repository.
 
-🔹 Customizable commit frequency, active days, and commit messages.
+- Customizable commit frequency, active days, and commit messages.
 
-🔹 Cross-platform support – Works on Windows & Linux (Linux requires a GitHub PAT).
+- Cross-platform support – Works on Windows & Linux (Linux requires a GitHub PAT).
 
 ## :sparkles: Features
 - Customizable commit history – Define start & end dates, active days per week, and commits per day.
@@ -113,17 +113,19 @@ Maximum Commits per Day: 15
 ## :pushpin: Screenshot Demo
 ![](docs/git_contribot_demo.gif)
 
+---
 - Before running `git-contribot`
 
 ![](docs/activity_graph_before.png)
 
+---
 - `git-contribot` in process
 
 ![](docs/activity_graph_before_process_1.png)
 
 ![](docs/activity_graph_before_process_2.png)
 
-
+---
 - After running `git-contribot`
 
 ![](docs/activity_graph_after.png)
